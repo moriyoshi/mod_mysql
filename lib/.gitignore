@@ -1,0 +1,13 @@
+Makefile
+Makefile.in
+*~
+*.a
+*.o
+*.so
+*.lo
+*.la
+*.lai
+*.lax
+*.loT
+*.Plo
+.libs

@@ -1,0 +1,77 @@
+AC_PREREQ(2.57)
+AC_INIT(mod_mysql, 0.0, moriyoshi@users.sourceforge.net)
+AM_INIT_AUTOMAKE(mod_mysql, 0.0)
+AC_CONFIG_SRCDIR([server/mod_mysql.cpp])
+AM_CONFIG_HEADER(config.h)
+AM_MAINTAINER_MODE
+
+AC_SUBST(PACKAGE_VERSION)
+AC_SUBST(PACKAGE_NAME)
+AC_SUBST(PACKAGE_TARNAME)
+
+enable_static=no
+
+AC_PROG_CXX
+AC_PROG_CC
+AC_PROG_LN_S
+AC_PROG_INSTALL
+AM_PROG_LIBTOOL
+
+AC_CHECK_PROGS([DOXYGEN], [doxygen])
+AC_SUBST(DOXYGEN)
+
+AC_HEADER_STDC
+AC_CHECK_HEADERS([string.h assert.h sys/uio.h])
+AC_CHECK_TYPES([struct iovec], [], [], [
+#ifdef HAVE_SYS_UIO_H
+#include "sys/uio.h"
+#endif
+])
+
+AC_HEADER_STDBOOL
+AC_C_CONST
+AC_C_INLINE
+AC_TYPE_SIZE_T
+
+AC_FUNC_MEMCMP
+AC_CHECK_FUNCS([memmove memset strrchr strtoll])
+
+AC_ARG_WITH([apxs], [  --with-apxs=PATH-TO-APXS    specify APXS location], [
+  MOD_MYSQL_CHECK_APXS(["$withval"], [], [
+    AC_MSG_ERROR([could not find apxs in "$withval"])
+  ])
+], [
+  MOD_MYSQL_CHECK_APXS([
+    /usr/sbin/apxs
+    /usr/local/sbin/apxs
+    /usr/bin/apxs
+    /usr/local/bin/apxs
+    /opt/apache/bin/apxs
+    /usr/local/apache/bin/apxs
+    /usr/sbin/apxs2
+    /usr/local/sbin/apxs2
+    /usr/bin/apxs2
+    /usr/local/bin/apxs2
+    /opt/apache/bin/apxs2
+    /usr/local/apache/bin/apxs2
+  ], [], [
+    AC_MSG_ERROR([could not determine apxs location])
+  ])
+])
+
+CFLAGS="$CFLAGS `$APXS -q CFLAGS`"
+INCLUDES="$INCLUDES -I`$APXS -q INCLUDEDIR`"
+MODULEDIR="`$APXS -q LIBEXECDIR`"
+
+AC_SUBST(APXS)
+AC_SUBST(INCLUDES)
+AC_SUBST(MODULEDIR)
+
+AC_OUTPUT([
+  Makefile
+  lib/Makefile
+  server/Makefile
+  modules/Makefile
+  modules/auth/Makefile
+  doxyconfig
+])
